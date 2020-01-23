@@ -24,8 +24,10 @@ export OPENBLAS_NUM_THREADS=1
 #     <(ss -tan | awk '{print $4}' | cut -d':' -f2 | grep '[0-9]\{1,5\}' | sort -u) \
 #     | shuf | head -n 1)
 NBTRIALS=5
-LOWER=9001  # Lower bound on searched port numbers
-UPPER=9099  # Upper bound on searched port numbers
+#LOWER=9001  # Lower bound on searched port numbers
+#UPPER=9099  # Upper bound on searched port numbers
+read LOWER UPPER < /proc/sys/net/ipv4/ip_local_port_range
+echo "LOWER: $LOWER / UPPER:$UPPER"
 SUCCESS=0
 for ((TRIAL=1; TRIAL<=$NBTRIALS; TRIAL++))
 do
@@ -33,7 +35,9 @@ do
     for ((GADGETRON_PORT=$LOWER; GADGETRON_PORT<=$UPPER; GADGETRON_PORT++))
     do
         export GADGETRON_PORT
-        /usr/bin/supervisord -c /opt/supervisord.conf && SUCCESS=1 && break 2 
+	echo "Trying port $GADGETRON_PORT..."
+        unlink /var/run/supervisor.sock
+	/usr/bin/supervisord -c /opt/supervisord.conf && SUCCESS=1 && break 2 
     done
     
 done
