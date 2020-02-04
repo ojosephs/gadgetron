@@ -19,23 +19,19 @@ export OPENBLAS_NUM_THREADS=1
 # The returned port might not really be free in case concurrent containers
 # are running this piece of code at the same time. We allow for a few
 # unsuccessfull trials to account for this.
-# export GADGETRON_PORT=$(comm -23 \
-#     <(seq "$LOWER" "$UPPER" | sort) \
-#     <(ss -tan | awk '{print $4}' | cut -d':' -f2 | grep '[0-9]\{1,5\}' | sort -u) \
-#     | shuf | head -n 1)
 NBTRIALS=5
 #LOWER=9001  # Lower bound on searched port numbers
 #UPPER=9099  # Upper bound on searched port numbers
 read LOWER UPPER < /proc/sys/net/ipv4/ip_local_port_range
-echo "LOWER: $LOWER / UPPER:$UPPER"
+echo "LOWER: $LOWER / UPPER: $UPPER"
 SUCCESS=0
 for ((TRIAL=1; TRIAL<=$NBTRIALS; TRIAL++))
 do
     echo "Trying to launch gadgetron, trial $TRIAL..."
-    for ((GADGETRON_PORT=$LOWER; GADGETRON_PORT<=$UPPER; GADGETRON_PORT++))
+    for ((SUPERVISORD_PORT =$LOWER; SUPERVISORD_PORT<=$UPPER; SUPERVISORD_PORT++))
     do
-        export GADGETRON_PORT
-	echo "Trying port $GADGETRON_PORT..."
+        export SUPERVISORD_PORT
+	echo "Trying port $SUPERVISORD_PORT..."
         unlink /var/run/supervisor.sock
 	/usr/bin/supervisord -c /opt/supervisord.conf && SUCCESS=1 && break 2 
     done
@@ -44,9 +40,9 @@ done
 
 if [ "$SUCCESS" = "1" ]
 then
-    echo "Successfully launched gadgetron on port $GADGETRON_PORT."
+    echo "Successfully launched supervisor on port $SUPERVISORD_PORT."
 else
-    echo "Failed to launch gadgetron."
+    echo "Failed to launch supervisor."
 fi
     
 
