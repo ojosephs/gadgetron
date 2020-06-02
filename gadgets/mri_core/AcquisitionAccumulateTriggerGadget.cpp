@@ -59,8 +59,7 @@ namespace Gadgetron {
                 }
                 add_stats(bucket.refstats_[espace], head);
             }
-            if (!(ISMRMRD::FlagBit(ISMRMRD::ISMRMRD_ACQ_IS_PARALLEL_CALIBRATION).isSet(head.flags)
-                    || ISMRMRD::FlagBit(ISMRMRD::ISMRMRD_ACQ_IS_PHASECORR_DATA).isSet(head.flags))) {
+            if (!ISMRMRD::FlagBit(ISMRMRD::ISMRMRD_ACQ_IS_PARALLEL_CALIBRATION).isSet(head.flags)) {
                 if (bucket.datastats_.size() < (espace + 1)) {
                     bucket.datastats_.resize(espace + 1);
                 }
