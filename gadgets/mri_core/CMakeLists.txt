@@ -6,6 +6,7 @@ find_package(ZFP)
 
 
 
+include_directories(${HDF5_INCLUDE_DIR})
 
 set(gadgetron_mricore_header_files GadgetMRIHeaders.h
         NoiseAdjustGadget.h
@@ -25,7 +26,7 @@ set(gadgetron_mricore_header_files GadgetMRIHeaders.h
         RemoveROOversamplingGadget.h
         CoilReductionGadget.h
         ScaleGadget.h
-       FlowPhaseSubtractionGadget.h
+        FlowPhaseSubtractionGadget.h
         readers/GadgetIsmrmrdReader.h
         PhysioInterpolationGadget.h
         IsmrmrdDumpGadget.h
@@ -67,7 +68,10 @@ set(gadgetron_mricore_header_files GadgetMRIHeaders.h
         ImageAccumulatorGadget.h
         writers/GadgetIsmrmrdWriter.h
         ImageResizingGadget.h
-        DenoiseGadget.h)
+        ImageArraySendMixin.h
+        ImageArraySendMixin.hpp
+        DenoiseGadget.h
+        CoilComputationGadget.h)
 
 set(gadgetron_mricore_src_files
         AcquisitionPassthroughGadget.cpp
@@ -129,7 +133,8 @@ set(gadgetron_mricore_src_files
         writers/GadgetIsmrmrdWriter.cpp
         ImageResizingGadget.cpp
         AutoScaleGadget.cpp
-        DenoiseGadget.cpp)
+        DenoiseGadget.cpp
+        CoilComputationGadget.cpp)
 
 set(gadgetron_mricore_config_files
         config/default.xml
@@ -196,13 +201,12 @@ target_link_libraries(gadgetron_mricore
         gadgetron_toolbox_cpuoperator
         gadgetron_toolbox_cpuklt
         gadgetron_toolbox_mri_core
-        ${ISMRMRD_LIBRARIES}
         boost
         )
 
 target_include_directories(gadgetron_mricore
         PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR})
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 
 if (ZFP_FOUND)
     message("ZFP Found")
@@ -232,6 +236,7 @@ install(FILES
 install(FILES ${gadgetron_mricore_config_files} DESTINATION ${GADGETRON_INSTALL_CONFIG_PATH} COMPONENT main)
 
 install(TARGETS gadgetron_mricore
+        EXPORT gadgetron-export
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 	RUNTIME DESTINATION bin
@@ -239,3 +244,4 @@ install(TARGETS gadgetron_mricore
 )
 
 
+set(GADGETRON_BUILD_RPATH "${CMAKE_CURRENT_BINARY_DIR};${GADGETRON_BUILD_RPATH}" PARENT_SCOPE)

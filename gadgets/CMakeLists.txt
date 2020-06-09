@@ -8,6 +8,7 @@ add_subdirectory(interventional_mri)
 add_subdirectory(cmr)
 add_subdirectory(epi)
 add_subdirectory(fatwater)
+add_subdirectory(T1)
 
 if(BART_FOUND)
   add_subdirectory(bart)
@@ -50,3 +51,5 @@ if(PLPLOT_FOUND)
         add_subdirectory(plplot)
     endif ()
 endif()
+
+set(GADGETRON_BUILD_RPATH "${CMAKE_CURRENT_BINARY_DIR};${GADGETRON_BUILD_RPATH}" PARENT_SCOPE)

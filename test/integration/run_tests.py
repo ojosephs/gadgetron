@@ -9,6 +9,7 @@ import json
 import argparse
 import itertools
 import subprocess
+from pathlib import Path
 
 
 def output_csv(stats, filename):
@@ -22,6 +23,9 @@ def output_csv(stats, filename):
 
 def main():
 
+
+    script_dir = Path(sys.argv[0]).parent
+    subscript = script_dir / "run_gadgetron_test.py"
     stats = []
     passed = []
     failed = []
@@ -50,6 +54,13 @@ def main():
     parser.add_argument('-e', '--external', action='store_const', const=['-e'], default=[],
                         help="Use external Gadgetron; don't start a new instance each test.")
 
+    parser.add_argument('-d', '--data-folder',
+                        type=str, default='data',
+                        help="Look for test data in the specified folder")
+    parser.add_argument('-t', '--test-folder',
+                        type=str, default='test',
+                        help="Save Gadgetron and Client output and logs to specified folder")
+
     parser.add_argument('-F', '--ignore-failures', dest='failure_handler',
                         action='store_const', const=ignore_failure, default=exit_on_failure,
                         help="Ignore a failing cases; keep running tests.")
@@ -66,8 +77,10 @@ def main():
 
     for i, test in enumerate(tests, start=1):
         print("\nTest {} of {}: {}\n".format(i, len(tests), test))
-        proc = subprocess.run([sys.executable, 'run_gadgetron_test.py',
+        proc = subprocess.run([sys.executable, str(subscript),
                                '-a', str(args.host),
+                               '-d', str(args.data_folder),
+                               '-t', str(args.test_folder),
                                '-p', str(args.port)] + args.external + [test])
 
         handlers.get(proc.returncode)(test)

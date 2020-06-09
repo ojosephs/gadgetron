@@ -8,11 +8,14 @@ add_library(gadgetron_core_writers SHARED
         IsmrmrdImageArrayWriter.h
         AcquisitionBucketWriter.cpp
         AcquisitionBucketWriter.h
-        )
+        AcquisitionWriter.cpp
+        AcquisitionWriter.h
+        WaveformWriter.cpp
+        WaveformWriter.h)
 
 target_link_libraries(gadgetron_core_writers
         gadgetron_core
-        ismrmrd
+        ISMRMRD::ISMRMRD
         gadgetron_toolbox_mri_core)
 
 set_target_properties(gadgetron_core_writers PROPERTIES
@@ -20,9 +23,11 @@ set_target_properties(gadgetron_core_writers PROPERTIES
         SOVERSION ${GADGETRON_SOVERSION})
 
 install(TARGETS gadgetron_core_writers
-   LIBRARY DESTINATION lib
-   ARCHIVE DESTINATION lib
-   RUNTIME DESTINATION bin
-   COMPONENT main
-)
+        EXPORT gadgetron-export
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        COMPONENT main
+        )
 
+set(GADGETRON_BUILD_RPATH "${CMAKE_CURRENT_BINARY_DIR};${GADGETRON_BUILD_RPATH}" PARENT_SCOPE)
