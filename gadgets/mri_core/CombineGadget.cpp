@@ -1,4 +1,3 @@
-#include "GadgetIsmrmrdReadWrite.h"
 #include "CombineGadget.h"
 
 namespace Gadgetron{
@@ -48,7 +47,7 @@ process( GadgetContainerMessage<ISMRMRD::ImageHeader>* m1,
 	  phase += mag_tmp*arg(d1[offset + c*img_block]);
 	  mag += mag_tmp;
 	}
-	d2[offset] = std::polar(std::sqrt(mag),phase);
+	d2[offset] = std::polar(std::sqrt(mag),phase/mag);
       }
     }
   }

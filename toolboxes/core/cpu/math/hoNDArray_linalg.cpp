@@ -169,17 +169,14 @@ extern "C" void zgetri_( const lapack_int* n, lapack_complex_double* a, const la
 namespace Gadgetron
 {
 
-// following matrix computation calls MKL functions
-#if defined(USE_MKL) || defined(USE_LAPACK)
+
 
 void gemm(hoNDArray< std::complex<float> >& C, const hoNDArray< std::complex<float> >& A, const hoNDArray< std::complex<float> >& B)
 {
     typedef std::complex<float> T;
-    try
-    {
         char TA, TB;
 
-        GADGET_CHECK_THROW( (&C!=&A) && (&C!=&B) && (&A!=&B) );
+        GADGET_CHECK_THROW( (&C!=&A) && (&C!=&B) );
 
         lapack_int lda = (lapack_int)A.get_size(0);
         lapack_int ldb = (lapack_int)B.get_size(0);
@@ -207,11 +204,7 @@ void gemm(hoNDArray< std::complex<float> >& C, const hoNDArray< std::complex<flo
         TB = 'N';
 
         cgemm_(&TA, &TB, &M, &N, &K, reinterpret_cast<lapack_complex_float*>(&alpha), reinterpret_cast<const lapack_complex_float*>(pA), &lda, reinterpret_cast<const lapack_complex_float*>(pB), &ldb, reinterpret_cast<lapack_complex_float*>(&beta), reinterpret_cast<lapack_complex_float*>(pC), &ldc);
-    }
-    catch(...)
-    {
-        GADGET_THROW("Errors in gemm(hoNDArray< std::complex<float> >& C, const hoNDArray< std::complex<float> >& A, const hoNDArray< std::complex<float> >& B) ...");
-    }
+
 }
 
 template<> EXPORTCPUCOREMATH 
@@ -355,11 +348,9 @@ void gemm(hoNDArray<double>& C, const hoNDArray<double>& A, bool transA, const h
 template<> EXPORTCPUCOREMATH 
 void gemm(hoNDArray< std::complex<float> >& C, const hoNDArray< std::complex<float> >& A, bool transA, const hoNDArray< std::complex<float> >& B, bool transB)
 {
-    try
-    {
         typedef  std::complex<float>  T;
 
-        GADGET_CHECK_THROW( (&C!=&A) && (&C!=&B) && (&A!=&B) );
+        GADGET_CHECK_THROW( (&C!=&A) && (&C!=&B)  );
 
         char TA, TB;
 
@@ -414,11 +405,7 @@ void gemm(hoNDArray< std::complex<float> >& C, const hoNDArray< std::complex<flo
         }
 
         cgemm_(&TA, &TB, &M, &N, &K, reinterpret_cast<lapack_complex_float*>(&alpha), reinterpret_cast<const lapack_complex_float*>(pA), &lda, reinterpret_cast<const lapack_complex_float*>(pB), &ldb, reinterpret_cast<lapack_complex_float*>(&beta), reinterpret_cast<lapack_complex_float*>(pC), &ldc);
-    }
-    catch(...)
-    {
-        GADGET_THROW("Errors in gemm(hoNDArray< std::complex<float> >& C, const hoNDArray< std::complex<float> >& A, bool transA, const hoNDArray< std::complex<float> >& B, bool transB) ...");
-    }
+
 }
 
 template<> EXPORTCPUCOREMATH 
@@ -1925,14 +1912,14 @@ void SolveLinearSystem_Tikhonov(hoNDArray<T>& A, hoNDArray<T>& b, hoNDArray<T>& 
     catch(...)
     {
         GERROR_STREAM("posv failed in SolveLinearSystem_Tikhonov(... ) ... ");
-        GDEBUG_STREAM("A = " << Gadgetron::norm2(A));
-        GDEBUG_STREAM("b = " << Gadgetron::norm2(b));
-        GDEBUG_STREAM("AHA = " << Gadgetron::norm2(AHA));
+        GDEBUG_STREAM("A = " << Gadgetron::nrm2(A));
+        GDEBUG_STREAM("b = " << Gadgetron::nrm2(b));
+        GDEBUG_STREAM("AHA = " << Gadgetron::nrm2(AHA));
         GDEBUG_STREAM("trA = " << trA);
-        GDEBUG_STREAM("x = " << Gadgetron::norm2(x));
+        GDEBUG_STREAM("x = " << Gadgetron::nrm2(x));
 
         gemm(x, A, true, b, false);
-        GDEBUG_STREAM("SolveLinearSystem_Tikhonov - x = " << Gadgetron::norm2(x));
+        GDEBUG_STREAM("SolveLinearSystem_Tikhonov - x = " << Gadgetron::nrm2(x));
 
         try
         {
@@ -1943,7 +1930,7 @@ void SolveLinearSystem_Tikhonov(hoNDArray<T>& A, hoNDArray<T>& b, hoNDArray<T>& 
             GERROR_STREAM("hesv failed in SolveLinearSystem_Tikhonov(... ) ... ");
 
             gemm(x, A, true, b, false);
-            GDEBUG_STREAM("SolveLinearSystem_Tikhonov - x = " << Gadgetron::norm2(x));
+            GDEBUG_STREAM("SolveLinearSystem_Tikhonov - x = " << Gadgetron::nrm2(x));
 
             try
             {
@@ -1965,6 +1952,58 @@ template EXPORTCPUCOREMATH void SolveLinearSystem_Tikhonov(hoNDArray< complext<f
 template EXPORTCPUCOREMATH void SolveLinearSystem_Tikhonov(hoNDArray< std::complex<double> >& A, hoNDArray< std::complex<double> >& b, hoNDArray< std::complex<double> >& x, double lamda);
 template EXPORTCPUCOREMATH void SolveLinearSystem_Tikhonov(hoNDArray< complext<double> >& A, hoNDArray< complext<double> >& b, hoNDArray< complext<double> >& x, double lamda);
 
-#endif // defined(USE_MKL) || defined(USE_LAPACK)
+template <typename T>
+void linFit(const hoNDArray<T>& x, const hoNDArray<T>& y, T& a, T& b)
+{
+    try
+    {
+        GADGET_CHECK_THROW(x.get_number_of_elements() == y.get_number_of_elements());
+
+        size_t N = x.get_number_of_elements();
+
+        hoNDArray<T> A;
+        A.create(N, 2);
+
+        size_t n;
+        for (n=0; n<N; n++)
+        {
+            A(n, 0) = x(n);
+            A(n, 1) = 1;
+        }
+
+        hoNDArray<T> A2(A);
+
+        hoNDArray<T> ATA(2, 2), ATy(2, 1);
+        gemm(ATA, A, true, A2, false);
+        gemm(ATy, A, true, y, false);
+
+        getri(ATA);
+
+        hoNDArray<T> res;
+        res.create(2, 1);
+        gemm(res, ATA, false, ATy, false);
+
+        a = res(0);
+        b = res(1);
+
+        /*arma::Col<T> vx = as_arma_col(&x);
+        arma::Col<T> vy = as_arma_col(&y);
+
+        arma::Col<T> P = arma::polyfit(vx, vy, 1);
+
+        a = P(0);
+        b = P(1);*/
+    }
+    catch (...)
+    {
+        GADGET_THROW("Errors in linFit(const hoNDArray<T>& x, const hoNDArray<T>& y, T& a, T& b) ... ");
+    }
+}
+
+template EXPORTCPUCOREMATH void linFit(const hoNDArray<float>& x, const hoNDArray<float>& y, float& a, float& b);
+template EXPORTCPUCOREMATH void linFit(const hoNDArray<double>& x, const hoNDArray<double>& y, double& a, double& b);
+template EXPORTCPUCOREMATH void linFit(const hoNDArray< std::complex<float> >& x, const hoNDArray< std::complex<float> >& y, std::complex<float>& a, std::complex<float>& b);
+template EXPORTCPUCOREMATH void linFit(const hoNDArray< std::complex<double> >& x, const hoNDArray< std::complex<double> >& y, std::complex<double>& a, std::complex<double>& b);
+
 
 }

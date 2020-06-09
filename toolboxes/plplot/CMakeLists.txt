@@ -7,19 +7,6 @@ endif ()
 include_directories(${PLPLOT_INCLUDE_DIR})
 link_directories(${PLPLOT_LIB_DIR})
 
-include_directories(
-    ${Boost_INCLUDE_DIR} 
-    ${ARMADILLO_INCLUDE_DIRS} 
-    ${ISMRMRD_INCLUDE_DIR}
-    ${CMAKE_SOURCE_DIR}/toolboxes/core
-    ${CMAKE_SOURCE_DIR}/toolboxes/core/cpu
-    ${CMAKE_SOURCE_DIR}/toolboxes/core/cpu/image
-    ${CMAKE_SOURCE_DIR}/toolboxes/core/cpu/hostutils
-    ${CMAKE_SOURCE_DIR}/toolboxes/core/cpu/math
-    ${CMAKE_SOURCE_DIR}/toolboxes/core/cpu/image
-    ${CMAKE_SOURCE_DIR}/toolboxes/core/cpu/algorithm
-    ${CMAKE_SOURCE_DIR}/toolboxes/mri_core
-)
 
 set(header_files GtPLplot.h)
 set(src_files GtPLplot.cpp)
@@ -43,7 +30,17 @@ target_link_libraries(gadgetron_toolbox_plplot
                       gadgetron_toolbox_mri_core
                       gadgetron_toolbox_cpucore_math )
 
-install(TARGETS gadgetron_toolbox_plplot DESTINATION lib COMPONENT main)
+target_include_directories(gadgetron_toolbox_plplot
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR})
+
+install(TARGETS gadgetron_toolbox_plplot
+	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib
+	RUNTIME DESTINATION bin
+	COMPONENT main
+)
+
 
 install (FILES  
         PLplotExport.h 

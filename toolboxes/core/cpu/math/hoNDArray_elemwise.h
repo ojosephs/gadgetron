@@ -27,6 +27,7 @@
 
 #include "hoNDArray.h"
 #include "cpucore_math_export.h"
+#include "cpp_blas.h"
 
 #include <complex>
 
@@ -210,6 +211,8 @@ void addEpsilon(hoNDArray<T>& x);
 */
 template <typename T> EXPORTCPUCOREMATH 
 void argument(const hoNDArray<T>& x, hoNDArray<typename realType<T>::Type>& r);
+template<class T>
+hoNDArray<realType_t<T>> argument(const hoNDArray<T>& x);
 
 /**
 * @brief r = 1/x
@@ -223,10 +226,9 @@ void inv(const hoNDArray<T>& x, hoNDArray<T>& r);
  * @return A new array containing the element-wise absolute values of the input.
  */
 template<class T> EXPORTCPUCOREMATH boost::shared_ptr< hoNDArray<typename realType<T>::Type> > abs( hoNDArray<T> *x );
-template <typename T> EXPORTCPUCOREMATH void abs(const hoNDArray<T>& x, hoNDArray<typename realType<T>::Type>& r);
-template <typename T> EXPORTCPUCOREMATH void abs(const hoNDArray< std::complex<T> >& x, hoNDArray< std::complex<T> >& r);
-template <typename T> EXPORTCPUCOREMATH void abs(const hoNDArray< complext<T> >& x, hoNDArray< complext<T> >& r);
- 
+template<class T> EXPORTCPUCOREMATH hoNDArray<typename realType<T>::Type> abs(const  hoNDArray<T>& x );
+template <typename T, typename R> EXPORTCPUCOREMATH void abs(const hoNDArray<T>& x, hoNDArray<R>& r);
+
 /**
  * @brief Calculates the element-wise absolute values (l2 norm) of the array entries (in place).
  * @param[in,out] x Input and output array.
@@ -315,21 +317,22 @@ template<class T> EXPORTCPUCOREMATH void sgn_inplace( hoNDArray<T> *x );
  * @param[in] x Input array.
  * @return A new array of the real component of the complex array.
  */
-template<class T> EXPORTCPUCOREMATH boost::shared_ptr< hoNDArray<typename realType<T>::Type> > real( hoNDArray<T> *x );
+template<class T> EXPORTCPUCOREMATH boost::shared_ptr< hoNDArray<typename realType<T>::Type> > real(const  hoNDArray<T> *x );
+    template<class T> EXPORTCPUCOREMATH  hoNDArray<realType_t<T>> real(const  hoNDArray<T>&x );
 
 /**
  * @brief Extract the imaginary component from a complex array.
  * @param[in] x Input array.
  * @return A new array of the imaginary component of the complex array.
  */
-template<class T> EXPORTCPUCOREMATH boost::shared_ptr< hoNDArray<typename realType<T>::Type> > imag( hoNDArray<T> *x );
-
+template<class T> EXPORTCPUCOREMATH boost::shared_ptr< hoNDArray<typename realType<T>::Type> > imag( const hoNDArray<T> *x );
+template<class T> EXPORTCPUCOREMATH  hoNDArray<realType_t<T>> imag(const  hoNDArray<T>&x );
 /**
  * @brief Create a new array of the complex conjugate of the input array. For real arrays a copy of the input array is return.
  * @param[in] x Input array.
  * @return A new array of the complex conjugate of the input array.
  */
-template<class T> EXPORTCPUCOREMATH boost::shared_ptr< hoNDArray<T> > conj( hoNDArray<T> *x );
+template<class T> EXPORTCPUCOREMATH boost::shared_ptr< hoNDArray<T> > conj( const hoNDArray<T> *x );
 
 /**
  * @brief Construct a complex array from a real array.
@@ -337,7 +340,7 @@ template<class T> EXPORTCPUCOREMATH boost::shared_ptr< hoNDArray<T> > conj( hoND
  * @return A new complex array containing the input array in the real component and zeros in the imaginary component.
  */
 template<class T> EXPORTCPUCOREMATH boost::shared_ptr< hoNDArray<T> >
-real_to_complex( hoNDArray<typename realType<T>::Type> *x );
+real_to_complex( const hoNDArray<typename realType<T>::Type> *x );
 
 template<class T> EXPORTCPUCOREMATH boost::shared_ptr< hoNDArray<T> >
 real_imag_to_complex( hoNDArray<typename realType<T>::Type> *real, hoNDArray<typename realType<T>::Type>* imag);
@@ -403,7 +406,7 @@ template<class T> void clear( hoNDArray<T>& x )
 {
     if ( x.get_number_of_elements() > 0 )
     {
-        memset( x.get_data_ptr(), 0, x.get_number_of_elements()*sizeof(T));
+        memset( x.get_data_ptr(), 0, x.get_number_of_elements() * sizeof(T));
     }
 }
 
@@ -656,22 +659,17 @@ template<class T> EXPORTCPUCOREMATH hoNDArray< complext<T> >& operator/= (hoNDAr
  * @param[in] x Array
  * @param[in,out] y Array
  */
-template<class T> EXPORTCPUCOREMATH void axpy(T a, hoNDArray<T> *x, hoNDArray<T> *y );
-template<class T> EXPORTCPUCOREMATH void axpy(T a, hoNDArray< std::complex<T> > *x, hoNDArray< std::complex<T> > *y);
-template<class T> EXPORTCPUCOREMATH void axpy(T a, hoNDArray< complext<T> > *x, hoNDArray< complext<T> > *y );
+template<class T> void axpy(T a, const hoNDArray<T> *x, hoNDArray<T> *y ){ BLAS::axpy(x->get_number_of_elements(),a,x->get_data_ptr(),1,y->get_data_ptr(),1);}
 
 /**
 * @brief compute r = a*x + y
 */
-template <typename T> EXPORTCPUCOREMATH void axpy(T a, const hoNDArray<T>& x, const hoNDArray<T>& y, hoNDArray<T>& r);
-template <typename T> EXPORTCPUCOREMATH void axpy(T a, const hoNDArray< std::complex<T> >& x, const hoNDArray< std::complex<T> >& y, hoNDArray< std::complex<T> >& r);
+template <typename T> void axpy(T a, const hoNDArray<T>& x, hoNDArray<T>& y){ axpy(a,&x,&y);}
 
 /**
 * @brief compute x *= a
 */
-template <typename T> EXPORTCPUCOREMATH void scal(T a, hoNDArray<T>& x);
-template <typename T> EXPORTCPUCOREMATH void scal(T a, hoNDArray< std::complex<T> >& x);
-template <typename T> EXPORTCPUCOREMATH void scal(T a, hoNDArray< complext<T> >& x);
+template <typename R, typename T> void scal(R a, hoNDArray<T>& x) {BLAS::scal(x.get_number_of_elements(),a,x.get_data_ptr(),1);}
 
 /**
 * @brief 2D convolution

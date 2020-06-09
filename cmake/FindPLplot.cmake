@@ -5,10 +5,10 @@
 #  PLPLOT_LIBRARIES, the libraries needed to use PLplot.
 #  PLPLOT_FOUND, If false, do not try to use PLplot; if true, the macro definition USE_PLPLOT is added.
 
-if ( WIN32 )
-  if(NOT DEFINED ENV{PLPLOT_PATH})
-    set(PLPLOT_PATH "C:/Program Files" CACHE PATH "Where the PLplot are stored")
-  endif() 
+if (WIN32)
+    if (NOT DEFINED ENV{PLPLOT_PATH})
+        set(PLPLOT_PATH "C:/Program Files" CACHE PATH "Where the PLplot are stored")
+    endif ()
 else ()
     set(PLPLOT_PATH "/usr/include" CACHE PATH "Where the PLplot are stored")
 endif ()
@@ -22,7 +22,7 @@ else ()
 endif ()
 
 if (PLPLOT_FOUND)
-    if ( WIN32 )
+    if (WIN32)
         set(PLPLOT_INCLUDE_DIR "${PLPLOT_PATH}/plplot/include/plplot")
         set(PLPLOT_LIB_DIR "${PLPLOT_PATH}/plplot/lib")
         set(PLPLOT_LIBRARIES plplot)
@@ -30,10 +30,18 @@ if (PLPLOT_FOUND)
     else ()
         set(PLPLOT_INCLUDE_DIR "${PLPLOT_PATH}/plplot")
         set(PLPLOT_LIB_DIR "${PLPLOT_PATH}/../lib")
-        # linux distribution has older PLplot version
-        # the 'd' means double precision, not debug
-        set(PLPLOT_LIBRARIES plplotd)
-        set(PLPLOT_LIBRARIES ${PLPLOT_LIBRARIES} plplotcxxd)
+
+        find_library(PLPLOT_LIB
+                NAMES plplot plplotd
+                HINTS /usr/lib /usr/lib64 /usr/x86_64-linux-gnu)
+
+        find_library(PLPLOT_CXX_LIB
+                NAMES plplotcxx plplotcxxd
+                HINTS /usr/lib /usr/lib64 /usr/x86_64-linux-gnu)
+
+        set(PLPLOT_LIBRARIES ${PLPLOT_LIB} ${PLPLOT_CXX_LIB})
+
+        message("PLplot libraries: ${PLPLOT_LIBRARIES}")
     endif ()
 
     add_definitions(-DUSE_PLPLOT)

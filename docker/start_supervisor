@@ -5,5 +5,44 @@ export GADGETRON_SUPERVISOR_NODAEMON=${GADGETRON_SUPERVISOR_NODAEMON:-"true"}
 export GADGETRON_RELAY_HOST=${GADGETRON_RELAY_HOST:-"127.0.0.1"}
 export GADGETRON_LOG_FILENAME=${GADGETRON_LOG_FILENAME:-"/tmp/gadgetron.log"}
 export OMP_THREAD_LIMIT=$(($(nproc)*2))
+#export OMP_NUM_THREADS=$(nproc)
+#export OMP_WAIT_POLICY=active
+#export OMP_DYNAMIC=false
+#export OMP_PROC_BIND=true
+export OPENBLAS_NUM_THREADS=1
 
-/usr/bin/supervisord -c /opt/supervisord.conf 
+# if want to ensure high numerical reproducibility, turn on this option
+# export MKL_CBWR=COMPATIBLE
+
+# Find unused port
+# Trick copied from https://unix.stackexchange.com/questions/55913
+# The returned port might not really be free in case concurrent containers
+# are running this piece of code at the same time. We allow for a few
+# unsuccessfull trials to account for this.
+NBTRIALS=5
+#LOWER=9001  # Lower bound on searched port numbers
+#UPPER=9099  # Upper bound on searched port numbers
+read LOWER UPPER < /proc/sys/net/ipv4/ip_local_port_range
+echo "LOWER: $LOWER / UPPER: $UPPER"
+SUCCESS=0
+for ((TRIAL=1; TRIAL<=$NBTRIALS; TRIAL++))
+do
+    echo "Trying to launch gadgetron, trial $TRIAL..."
+    for ((SUPERVISORD_PORT =$LOWER; SUPERVISORD_PORT<=$UPPER; SUPERVISORD_PORT++))
+    do
+        export SUPERVISORD_PORT
+	echo "Trying port $SUPERVISORD_PORT..."
+        unlink /var/run/supervisor.sock
+	/usr/bin/supervisord -c /opt/supervisord.conf && SUCCESS=1 && break 2 
+    done
+    
+done
+
+if [ "$SUCCESS" = "1" ]
+then
+    echo "Successfully launched supervisor on port $SUPERVISORD_PORT."
+else
+    echo "Failed to launch supervisor."
+fi
+    
+
