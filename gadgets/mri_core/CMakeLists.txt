@@ -4,8 +4,6 @@ endif ()
 
 find_package(ZFP)
 
-
-
 include_directories(${HDF5_INCLUDE_DIR})
 
 set(gadgetron_mricore_header_files GadgetMRIHeaders.h
@@ -61,6 +59,7 @@ set(gadgetron_mricore_header_files GadgetMRIHeaders.h
         GenericReconAccumulateImageTriggerGadget.h
         GenericImageReconArrayToImageGadget.h
         GenericReconReferenceKSpaceDelayedBufferGadget.h
+        GenericReconImageToImageArrayGadget.h 
         WhiteNoiseInjectorGadget.h
         ImageFinishGadget.h
         dependencyquery/NoiseSummaryGadget.h
@@ -71,7 +70,9 @@ set(gadgetron_mricore_header_files GadgetMRIHeaders.h
         ImageArraySendMixin.h
         ImageArraySendMixin.hpp
         DenoiseGadget.h
-        CoilComputationGadget.h)
+        CoilComputationGadget.h 
+        ImageFFTGadget.h 
+        )
 
 set(gadgetron_mricore_src_files
         AcquisitionPassthroughGadget.cpp
@@ -126,6 +127,7 @@ set(gadgetron_mricore_src_files
         GenericImageReconGadget.cpp
         GenericReconAccumulateImageTriggerGadget.cpp
         GenericImageReconArrayToImageGadget.cpp
+        GenericReconImageToImageArrayGadget.cpp 
         WhiteNoiseInjectorGadget.cpp
         RateLimitGadget.cpp
         dependencyquery/NoiseSummaryGadget.cpp
@@ -134,7 +136,9 @@ set(gadgetron_mricore_src_files
         ImageResizingGadget.cpp
         AutoScaleGadget.cpp
         DenoiseGadget.cpp
-        CoilComputationGadget.cpp)
+        CoilComputationGadget.cpp
+        ImageFFTGadget.cpp
+        FlagTriggerGadget.cpp FlagTriggerGadget.h)
 
 set(gadgetron_mricore_config_files
         config/default.xml
@@ -160,6 +164,7 @@ set(gadgetron_mricore_config_files
         config/Generic_Cartesian_NonLinear_Spirit_RealTimeCine_Cloud.xml
         config/Generic_Cartesian_RandomSampling_NonLinear_Spirit_RealTimeCine_Cloud.xml
         config/Generic_Cartesian_Grappa_Cine_Denoise.xml
+        config/Generic_Cartesian_Image_Chain_FFT.xml
         config/NoiseSummary.xml
         config/ismrmrd_dump.xml
         )
@@ -179,12 +184,14 @@ if (Boost_PYTHON3_FOUND AND PYTHONLIBS_FOUND AND NUMPY_FOUND)
       set( gadgetron_mricore_src_files ${gadgetron_mricore_src_files} GenericReconCartesianGrappaAIGadget.cpp)
       set( gadgetron_mricore_config_files ${gadgetron_mricore_config_files} config/Generic_Cartesian_Grappa_AI.xml)
 
+      set( gadgetron_python_models_files models/grappa_ai.py )
 endif ()
 
 add_library(gadgetron_mricore SHARED
     gadgetron_mricore_export.h
     ${gadgetron_mricore_header_files}
     ${gadgetron_mricore_src_files}
+    ${gadgetron_mricore_config_files}
     DenoiseGadget.cpp DenoiseGadget.h)
 
 set_target_properties(gadgetron_mricore PROPERTIES VERSION ${GADGETRON_VERSION_STRING} SOVERSION ${GADGETRON_SOVERSION})
@@ -201,7 +208,6 @@ target_link_libraries(gadgetron_mricore
         gadgetron_toolbox_cpuoperator
         gadgetron_toolbox_cpuklt
         gadgetron_toolbox_mri_core
-        boost
         )
 
 target_include_directories(gadgetron_mricore
@@ -225,8 +231,11 @@ if (Boost_PYTHON3_FOUND AND PYTHONLIBS_FOUND AND NUMPY_FOUND)
    target_link_libraries(gadgetron_mricore
                         gadgetron_toolbox_python
                          )
-endif ()
 
+    install(FILES
+        ${gadgetron_python_models_files}
+        DESTINATION ${GADGETRON_INSTALL_PYTHON_MODULE_PATH} COMPONENT main)
+endif ()
 
 install(FILES
         gadgetron_mricore_export.h
@@ -237,11 +246,10 @@ install(FILES ${gadgetron_mricore_config_files} DESTINATION ${GADGETRON_INSTALL_
 
 install(TARGETS gadgetron_mricore
         EXPORT gadgetron-export
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib
-	RUNTIME DESTINATION bin
-	COMPONENT main
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        COMPONENT main
 )
-
 
 set(GADGETRON_BUILD_RPATH "${CMAKE_CURRENT_BINARY_DIR};${GADGETRON_BUILD_RPATH}" PARENT_SCOPE)

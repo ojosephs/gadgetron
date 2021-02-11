@@ -12,6 +12,7 @@
 #include "hoNDFFT.h"
 
 #include "log.h"
+#include <range/v3/action.hpp>
 
 namespace {
     using namespace Gadgetron;
@@ -51,13 +52,16 @@ namespace Gadgetron::Grappa {
     ImageAccumulator::ImageAccumulator(
             const Core::Context &context,
             const std::unordered_map<std::string, std::string> &props
-    ) : ChannelGadget<Slice>(props), context(context) {}
+    ) : ChannelGadget<Slice>(context,props), context(context) {}
 
     void ImageAccumulator::process(InputChannel<Slice> &in, OutputChannel &out) {
 
         AcquisitionBuffer buffer{context};
 
-        for (const auto &slice : in) {
+        for (auto slice : in) {
+
+            slice = std::move(slice) | ranges::actions::remove_if([](auto& acq){return std::get<ISMRMRD::AcquisitionHeader>(acq).isFlagSet(ISMRMRD::ISMRMRD_ACQ_IS_PARALLEL_CALIBRATION);});
+
             buffer.add(slice);
             out.push(create_reconstruction_job(slice.front(), slice.back(), buffer));
         }
