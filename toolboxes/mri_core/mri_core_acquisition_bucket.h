@@ -70,8 +70,7 @@ namespace Gadgetron
               }
               refstats_[espace].add_stats(head);
           }
-          if (!(ISMRMRD::FlagBit(ISMRMRD::ISMRMRD_ACQ_IS_PARALLEL_CALIBRATION).isSet(head.flags)
-              || ISMRMRD::FlagBit(ISMRMRD::ISMRMRD_ACQ_IS_PHASECORR_DATA).isSet(head.flags))) {
+          if (!ISMRMRD::FlagBit(ISMRMRD::ISMRMRD_ACQ_IS_PARALLEL_CALIBRATION).isSet(head.flags)) {
               if (datastats_.size() < (espace + 1)) {
                   datastats_.resize(espace + 1);
               }
