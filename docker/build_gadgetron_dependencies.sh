@@ -28,8 +28,11 @@ while [ "$1" != "" ]; do
     shift
 done
 
-# Specify repos and commits to build from here
 
+# Matlab needs some x stuff to not crash. xterm and its dependencies are enough
+
+apt update
+apt install xterm
 
 # VERSION & REPO TAGS
 
