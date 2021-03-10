@@ -30,9 +30,10 @@ done
 
 
 # Matlab needs some x stuff to not crash. xterm and its dependencies are enough
+# Nice to have vi, too
 
 apt update
-apt install xterm
+apt install xterm vim
 
 # VERSION & REPO TAGS
 
