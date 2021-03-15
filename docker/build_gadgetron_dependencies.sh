@@ -29,8 +29,7 @@ while [ "$1" != "" ]; do
 done
 
 
-# Matlab needs some x stuff to not crash. xterm and its dependencies are enough
-# Nice to have vi, too
+# Some useful general purpose tools
 
 apt update --quiet
 DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends --no-install-suggests --yes \

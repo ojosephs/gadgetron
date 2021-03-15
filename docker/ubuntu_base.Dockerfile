@@ -10,14 +10,11 @@ FROM $BASE_IMAGE
 WORKDIR /opt
 COPY install_ubuntu_dependencies.sh /opt/
 RUN chmod +x /opt/install_ubuntu_dependencies.sh
-COPY install_matlab_dependencies.sh /opt/
-RUN chmod +x /opt/install_matlab_dependencies.sh
 COPY build_gadgetron_dependencies.sh /opt/
 RUN chmod +x /opt/build_gadgetron_dependencies.sh
 
 # Install dependencies
 RUN /opt/install_ubuntu_dependencies.sh
-RUN /opt/install_matlab_dependencies.sh
 
 # for embedded python plot, we need agg backend
 RUN mkdir -p /root/.config/matplotlib && touch /root/.config/matplotlib/matplotlibrc && echo "backend : agg" >> /root/.config/matplotlib/matplotlibrc
