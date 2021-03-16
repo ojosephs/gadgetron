@@ -38,6 +38,7 @@ namespace Gadgetron {
 
 
 
+
         struct EqualityTrigger {
             explicit EqualityTrigger(TriggerDimension trig) : trigger{ trig } {}
             const TriggerDimension trigger;
