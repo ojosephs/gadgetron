@@ -32,11 +32,11 @@ done
 # VERSION & REPO TAGS
 
 ISMRMRD_URL=https://github.com/ismrmrd/ismrmrd.git
-ISMRMRD_REV=master
+ISMRMRD_REV=c86c89c
 SIEMENS_TO_ISMRMRD_URL=https://github.com/ismrmrd/siemens_to_ismrmrd.git
-SIEMENS_TO_ISMRMRD_REV=master
+SIEMENS_TO_ISMRMRD_REV=494963c
 PHILIPS_TO_ISMRMRD_URL=https://github.com/ismrmrd/philips_to_ismrmrd.git
-PHILIPS_TO_ISMRMRD_REV=master
+PHILIPS_TO_ISMRMRD_REV=9ef92a1
 
 
 mkdir -p ${WORKDIR}
