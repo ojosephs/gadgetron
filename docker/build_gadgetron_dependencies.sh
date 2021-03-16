@@ -29,13 +29,6 @@ while [ "$1" != "" ]; do
 done
 
 
-# Some useful general purpose tools
-
-apt update --quiet
-DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends --no-install-suggests --yes \
-xterm \
-vim
-
 # VERSION & REPO TAGS
 
 ISMRMRD_URL=https://github.com/ismrmrd/ismrmrd.git
@@ -44,11 +37,6 @@ SIEMENS_TO_ISMRMRD_URL=https://github.com/ismrmrd/siemens_to_ismrmrd.git
 SIEMENS_TO_ISMRMRD_REV=master
 PHILIPS_TO_ISMRMRD_URL=https://github.com/ismrmrd/philips_to_ismrmrd.git
 PHILIPS_TO_ISMRMRD_REV=master
-
-
-# Should these pip3 installs go here?
-pip3 install git+https://github.com/ismrmrd/ismrmrd-python.git
-pip3 install git+https://github.com/gadgetron/gadgetron-python.git
 
 
 mkdir -p ${WORKDIR}
