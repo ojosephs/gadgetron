@@ -39,11 +39,11 @@ vim
 # VERSION & REPO TAGS
 
 ISMRMRD_URL=https://github.com/ismrmrd/ismrmrd.git
-ISMRMRD_COMMIT=master
+ISMRMRD_REV=master
 SIEMENS_TO_ISMRMRD_URL=https://github.com/ismrmrd/siemens_to_ismrmrd.git
-SIEMENS_TO_ISMRMRD_COMMIT=master
+SIEMENS_TO_ISMRMRD_REV=master
 PHILIPS_TO_ISMRMRD_URL=https://github.com/ismrmrd/philips_to_ismrmrd.git
-PHILIPS_TO_ISMRMRD_COMMIT=master
+PHILIPS_TO_ISMRMRD_REV=master
 
 
 # Should these pip3 installs go here?
@@ -58,7 +58,7 @@ cd ${WORKDIR} && \
     rm -rf ismrmrd && \
     git clone ${ISMRMRD_URL} && \
     cd ismrmrd && \
-    git checkout ${ISMRMRD_COMMIT} && \
+    git checkout ${ISMRMRD_REV} && \
     mkdir build && \
     cd build && \
     cmake ../  -G Ninja && \
@@ -73,7 +73,7 @@ cd ${WORKDIR} && \
     rm -rf siemens_to_ismrmrd && \
     git clone ${SIEMENS_TO_ISMRMRD_URL} && \
     cd siemens_to_ismrmrd && \
-    git checkout ${SIEMENS_TO_ISMRMRD_COMMIT} && \
+    git checkout ${SIEMENS_TO_ISMRMRD_REV} && \
     mkdir build && \
     cd build && \
     cmake ../ -G Ninja && \
@@ -85,7 +85,7 @@ cd ${WORKDIR} && \
     rm -rf philips_to_ismrmrd && \
     git clone ${PHILIPS_TO_ISMRMRD_URL} && \
     cd philips_to_ismrmrd && \
-    git checkout ${PHILIPS_TO_ISMRMRD_COMMIT} && \
+    git checkout ${PHILIPS_TO_ISMRMRD_REV} && \
     mkdir build && \
     cd build && \
     cmake ../ -G Ninja && \
