@@ -57,7 +57,7 @@ def siemens_to_ismrmrd(echo_handler, *, input, output, parameters, schema, measu
     echo_handler(command)
     subprocess.run(command,
                    stdout=subprocess.PIPE,
-                   stderr=subprocess.STDOUT,
+                   stderr=subprocess.PIPE,
                    check=True)
 
 
@@ -74,7 +74,7 @@ def send_dependency_to_gadgetron(echo_handler, gadgetron, dependency):
     subprocess.run(command,
                    env=environment,
                    stdout=subprocess.PIPE,
-                   stderr=subprocess.STDOUT,
+                   stderr=subprocess.PIPE,
                    check=True)
 
 
@@ -93,7 +93,7 @@ def send_data_to_gadgetron(echo_handler, gadgetron, *, input, output, configurat
     subprocess.run(command,
                    env=environment,
                    stdout=subprocess.PIPE,
-                   stderr=subprocess.STDOUT,
+                   stderr=subprocess.PIPE,
                    check=True)
 
 
@@ -156,12 +156,12 @@ def prepare_rules(args, requirements):
 def validate_output(*, output_file, reference_file, output_dataset, reference_dataset,
                     value_threshold, scale_threshold):
     try:
-        output = numpy.squeeze(h5py.File(output_file)[output_dataset])
+        output = numpy.squeeze(h5py.File(output_file, mode='r')[output_dataset])
     except KeyError:
         return Failure, "Missing output data: {}".format(output_dataset)
 
     try:
-        reference = numpy.squeeze(h5py.File(reference_file)[reference_dataset])
+        reference = numpy.squeeze(h5py.File(reference_file, mode='r')[reference_dataset])
     except KeyError:
         return Failure, "Missing reference data"
 
@@ -192,6 +192,11 @@ def error_handlers(args, config):
         except subprocess.CalledProcessError as e:
             print("An error occurred in a subprocess with the following command:")
             print(' '.join(e.cmd))
+            print("============= stdout ============")
+            print(e.stdout.decode('utf-8'))
+            print("============= stderr ============")
+            print(e.stderr.decode('utf-8'))
+
             return Failure
 
     yield handle_subprocess_errors

@@ -10,7 +10,8 @@ set(header_files ../NDArray.h
                 cpucore_export.h 
                 hoNDArray.h
                 hoNDArray.hxx
-				hoNDArray_iterators.h
+                hoNDArray_converter.h
+				        hoNDArray_iterators.h
                 hoNDObjectArray.h
                 hoNDArray_utils.h
                 hoNDArray_fileio.h
@@ -73,7 +74,9 @@ target_link_libraries(
   gadgetron_toolbox_cpucore
   gadgetron_toolbox_log
   ISMRMRD::ISMRMRD
-	boost
+	Boost::boost
+    Boost::system
+    Boost::filesystem
   )
 
 install(TARGETS gadgetron_toolbox_cpucore

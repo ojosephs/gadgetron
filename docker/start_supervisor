@@ -44,5 +44,3 @@ then
 else
     echo "Failed to launch supervisor."
 fi
-    
-
